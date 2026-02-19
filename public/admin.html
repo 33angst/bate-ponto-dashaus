@@ -3,36 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel Admin - Das Haus</title>
+<title>Painel Admin</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
   <h1>Painel Administrativo</h1>
-  <button onclick="verRegistros()">Ver Registros</button>
-  <div id="lista"></div>
+
+  <h2>Cadastrar Funcionário</h2>
+  <input type="text" id="nome" placeholder="Nome do funcionário">
+  <button onclick="cadastrar()">Cadastrar</button>
+
+  <h2>Funcionários</h2>
+  <div id="listaFuncionarios"></div>
+
+  <h2>Relatórios</h2>
+  <button onclick="window.location='/exportar-excel'">Exportar Excel</button>
+  <button onclick="window.location='/exportar-pdf'">Exportar PDF</button>
+
+  <h2>Registros</h2>
+  <button onclick="verRegistros()">Atualizar</button>
+  <div id="registros"></div>
 </div>
 
 <script>
-async function verRegistros() {
-  const response = await fetch("/registros");
-  const data = await response.json();
+async function cadastrar() {
+  const nome = document.getElementById("nome").value;
 
-  const lista = document.getElementById("lista");
+  await fetch("/funcionarios", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nome })
+  });
+
+  document.getElementById("nome").value = "";
+  carregarFuncionarios();
+}
+
+async function carregarFuncionarios() {
+  const res = await fetch("/funcionarios");
+  const data = await res.json();
+
+  const lista = document.getElementById("listaFuncionarios");
   lista.innerHTML = "";
 
+  data.forEach(f => {
+    lista.innerHTML += `<p>${f.nome}</p>`;
+  });
+}
+
+async function verRegistros() {
+  const res = await fetch("/registros");
+  const data = await res.json();
+
+  const div = document.getElementById("registros");
+  div.innerHTML = "";
+
   data.forEach(r => {
-    lista.innerHTML += `
+    div.innerHTML += `
       <p>
-        ${r.data}<br>
-        Lat: ${r.latitude}<br>
-        Long: ${r.longitude}
+        <strong>${r.nome}</strong><br>
+        ${new Date(r.data).toLocaleString()}
       </p>
       <hr>
     `;
   });
 }
+
+carregarFuncionarios();
 </script>
 
 </body>
