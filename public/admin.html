@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Admin - Das Haus</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Painel Administrativo</h1>
+  <button onclick="verRegistros()">Ver Registros</button>
+  <div id="lista"></div>
+</div>
+
+<script>
+async function verRegistros() {
+  const response = await fetch("/registros");
+  const data = await response.json();
+
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  data.forEach(r => {
+    lista.innerHTML += `
+      <p>
+        ${r.data}<br>
+        Lat: ${r.latitude}<br>
+        Long: ${r.longitude}
+      </p>
+      <hr>
+    `;
+  });
+}
+</script>
+
+</body>
+</html>
