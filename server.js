@@ -3,10 +3,24 @@ const path = require("path");
 const { Pool } = require("pg");
 const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
+<<<<<<< HEAD
+=======
+const session = require("express-session");
+const bcrypt = require("bcrypt");
+>>>>>>> 6b210bda634ba43bbbb9fa7504ffc10132feec5e
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+<<<<<<< HEAD
+=======
+app.use(session({
+  secret: "dashaus_super_secreto_2026",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false }
+}));
+>>>>>>> 6b210bda634ba43bbbb9fa7504ffc10132feec5e
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -17,6 +31,18 @@ const pool = new Pool({
 
 // Criar tabelas automaticamente
 (async () => {
+<<<<<<< HEAD
+=======
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS admins (
+      id SERIAL PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      senha TEXT NOT NULL
+    )
+  `);
+
+>>>>>>> 6b210bda634ba43bbbb9fa7504ffc10132feec5e
   await pool.query(`
     CREATE TABLE IF NOT EXISTS funcionarios (
       id SERIAL PRIMARY KEY,
@@ -33,6 +59,10 @@ const pool = new Pool({
       longitude TEXT
     )
   `);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6b210bda634ba43bbbb9fa7504ffc10132feec5e
 })();
 
 // Cadastrar funcionário
@@ -127,3 +157,68 @@ app.get("/exportar-pdf", async (req, res) => {
 app.listen(PORT, () => {
   console.log("Servidor rodando na porta " + PORT);
 });
+<<<<<<< HEAD
+=======
+
+(async () => {
+  const email = "erickangst1234@gmail.com";
+  const senha = "DasHaus2026";
+
+  const hash = await bcrypt.hash(senha, 10);
+
+  const adminExistente = await pool.query(
+    "SELECT * FROM admins WHERE email = $1",
+    [email]
+  );
+
+  if (adminExistente.rows.length === 0) {
+    await pool.query(
+      "INSERT INTO admins (email, senha) VALUES ($1, $2)",
+      [email, hash]
+    );
+    console.log("Admin criado automaticamente!");
+  }
+})();
+
+app.post("/login", async (req, res) => {
+  const { email, senha } = req.body;
+
+  const admin = await pool.query(
+    "SELECT * FROM admins WHERE email=$1",
+    [email]
+  );
+
+  if (admin.rows.length === 0) {
+    return res.json({ success: false });
+  }
+
+  const senhaValida = await bcrypt.compare(
+    senha,
+    admin.rows[0].senha
+  );
+
+  if (!senhaValida) {
+    return res.json({ success: false });
+  }
+
+  req.session.adminId = admin.rows[0].id;
+
+  res.json({ success: true });
+});
+
+function protegerAdmin(req, res, next) {
+  if (!req.session.adminId) {
+    return res.redirect("/login.html");
+  }
+  next();
+}
+
+app.get("/admin.html", protegerAdmin, (req, res) => {
+  res.sendFile(__dirname + "/public/admin.html");
+});
+
+app.get("/logout", (req, res) => {
+  req.session.destroy();
+  res.redirect("/login.html");
+});
+>>>>>>> 6b210bda634ba43bbbb9fa7504ffc10132feec5e

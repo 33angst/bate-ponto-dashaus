@@ -6,11 +6,21 @@
     "start": "node server.js"
   },
   "dependencies": {
+<<<<<<< HEAD
     "bcrypt": "^6.0.0",
     "exceljs": "^4.3.0",
     "express": "^4.18.2",
     "express-session": "^1.19.0",
     "pdfkit": "^0.13.0",
     "pg": "^8.11.3"
+=======
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "exceljs": "^4.3.0",
+    "pdfkit": "^0.13.0",
+    "express-session": "^1.17.3",
+    "bcrypt": "^5.1.0",
+    "nodemailer": "^6.9.8"
+>>>>>>> 6b210bda634ba43bbbb9fa7504ffc10132feec5e
   }
 }
