@@ -3,10 +3,18 @@ const path = require("path");
 const { Pool } = require("pg");
 const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
+const session = require("express-session");
+const bcrypt = require("bcrypt");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(session({
+  secret: "dashaus_super_secreto_2026",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false }
+}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -159,3 +167,45 @@ const bcrypt = require("bcrypt");
     console.log("Admin criado automaticamente!");
   }
 })();
+
+app.post("/login", async (req, res) => {
+  const { email, senha } = req.body;
+
+  const admin = await pool.query(
+    "SELECT * FROM admins WHERE email=$1",
+    [email]
+  );
+
+  if (admin.rows.length === 0) {
+    return res.json({ success: false });
+  }
+
+  const senhaValida = await bcrypt.compare(
+    senha,
+    admin.rows[0].senha
+  );
+
+  if (!senhaValida) {
+    return res.json({ success: false });
+  }
+
+  req.session.adminId = admin.rows[0].id;
+
+  res.json({ success: true });
+});
+
+function protegerAdmin(req, res, next) {
+  if (!req.session.adminId) {
+    return res.redirect("/login.html");
+  }
+  next();
+}
+
+app.get("/admin.html", protegerAdmin, (req, res) => {
+  res.sendFile(__dirname + "/public/admin.html");
+});
+
+app.get("/logout", (req, res) => {
+  req.session.destroy();
+  res.redirect("/login.html");
+});
