@@ -127,3 +127,25 @@ app.get("/exportar-pdf", async (req, res) => {
 app.listen(PORT, () => {
   console.log("Servidor rodando na porta " + PORT);
 });
+
+const bcrypt = require("bcrypt");
+
+(async () => {
+  const email = "erickangst1234@gmail.com";
+  const senha = "DasHaus2026";
+
+  const hash = await bcrypt.hash(senha, 10);
+
+  const adminExistente = await pool.query(
+    "SELECT * FROM admins WHERE email = $1",
+    [email]
+  );
+
+  if (adminExistente.rows.length === 0) {
+    await pool.query(
+      "INSERT INTO admins (email, senha) VALUES ($1, $2)",
+      [email, hash]
+    );
+    console.log("Admin criado automaticamente!");
+  }
+})();
