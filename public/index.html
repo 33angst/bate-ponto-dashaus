@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bate Ponto - Das Haus</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Das Haus Marcenaria</h1>
+
+  <select id="funcionario"></select>
+
+  <button onclick="baterPonto()">Bater Ponto</button>
+
+  <p id="status"></p>
+</div>
+
+<script>
+async function carregarFuncionarios() {
+  const res = await fetch("/funcionarios");
+  const data = await res.json();
+
+  const select = document.getElementById("funcionario");
+  select.innerHTML = "";
+
+  data.forEach(f => {
+    select.innerHTML += `<option value="${f.id}">${f.nome}</option>`;
+  });
+}
+
+async function baterPonto() {
+  const funcionario_id = document.getElementById("funcionario").value;
+
+  navigator.geolocation.getCurrentPosition(async position => {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    await fetch("/bater-ponto", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ funcionario_id, latitude, longitude })
+    });
+
+    document.getElementById("status").innerText = "Ponto registrado com sucesso!";
+  });
+}
+
+carregarFuncionarios();
+</script>
+
+</body>
+</html>
