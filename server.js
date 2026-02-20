@@ -17,6 +17,15 @@ const pool = new Pool({
 
 // Criar tabelas automaticamente
 (async () => {
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS admins (
+      id SERIAL PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      senha TEXT NOT NULL
+    )
+  `);
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS funcionarios (
       id SERIAL PRIMARY KEY,
@@ -33,6 +42,7 @@ const pool = new Pool({
       longitude TEXT
     )
   `);
+
 })();
 
 // Cadastrar funcionário
