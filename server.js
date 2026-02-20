@@ -146,8 +146,6 @@ app.listen(PORT, () => {
   console.log("Servidor rodando na porta " + PORT);
 });
 
-const bcrypt = require("bcrypt");
-
 (async () => {
   const email = "erickangst1234@gmail.com";
   const senha = "DasHaus2026";
